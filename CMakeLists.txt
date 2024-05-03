@@ -9,7 +9,7 @@ include(${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
 
 set(CMAKE_CXX_STANDARD 23)
 
-set(SOURCE_FILES main.cpp convert.cpp ciede2000.cpp palette.cpp)
+set(SOURCE_FILES main.cpp convert.cpp ciede2000.cpp palette.cpp cli.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 

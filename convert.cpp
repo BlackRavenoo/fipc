@@ -48,3 +48,19 @@ std::array<double, 3> xyz2lab(double X, double Y, double Z) {
 
     return {L, a, b};
 }
+
+std::vector<std::array<double, 3>> hex_to_lab(const nlohmann::json& palette) {
+    std::vector<std::array<double, 3>> lab_colors;
+    
+    for (auto& [key, hex_color] : palette.items()) {
+        int r, g, b;
+        std::sscanf(hex_color.get<std::string>().c_str(), "#%02x%02x%02x", &r, &g, &b);
+
+        std::array<double, 3> xyz = rgb2xyz(r, g, b);
+        std::array<double, 3> lab = xyz2lab(xyz[0], xyz[1], xyz[2]);
+
+        lab_colors.push_back(lab);
+    }
+
+    return lab_colors;
+}

@@ -4,8 +4,17 @@
 #include "ciede2000.hpp"
 #include "convert.hpp"
 #include "palette.hpp"
+#include "cli.hpp"
 
-int main() {
+int main(int argc, char *argv[]) {
+    Args args = get_args(argc, argv);
+
+    std::cout << args.image << std::endl;
+
+    std::cout << args.palette << std::endl;
+
+    
+
     unsigned char r1 = 255, g1 = 0, b1 = 0;
     unsigned char r2 = 0, g2 = 255, b2 = 0;
 
@@ -26,7 +35,11 @@ int main() {
     double ciede2000Result = ciede2000(lab1_a, lab2_a);
     std::cout << std::fixed << std::setprecision(15) << ciede2000Result << std::endl;
 
-    auto res = nearest_palette(lab1_a, {lab2_a});
+    auto palette = read_palette(Palette::Catpuccin)["Latte"];
+
+    auto lab_colors = hex_to_lab(palette);
+
+    auto res = nearest_palette(lab1_a, lab_colors);
 
     std::cout << res[0] << " " << res[1] << " " << res[2] << std::endl;
     

@@ -9,7 +9,8 @@ enum class Palette {
     Gruvbox,
     RosePine,
     MaterialSakura,
-    Custom
+    Catpuccin,
+    Custom,
 };
 
 std::array<double, 3> nearest_palette(
@@ -17,4 +18,5 @@ std::array<double, 3> nearest_palette(
     const std::vector<std::array<double, 3>>& palette
 );
 
-nlohmann::json read_palette(const std::string& filename);
+nlohmann::json read_palette(const Palette palette);
+nlohmann::json read_palette_from_file(const std::string& filename);
