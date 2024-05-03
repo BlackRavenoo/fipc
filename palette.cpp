@@ -1,56 +1,50 @@
 #include <algorithm>
 #include <limits>
 #include <thread>
+#include <future>
 #include <array>
 #include <fstream>
 #include "ciede2000.hpp"
 #include "palette.hpp"
 
-//TODO: Remove hardcoded values
 std::array<double, 3> nearest_palette(
     const std::array<double, 3>& color, 
     const std::vector<std::array<double, 3>>& palette
 ) {
-    std::array<std::thread, 4> threads;
-    std::array<std::array<double, 3>, 4> results;
-    std::array<double, 4> min_distances = {
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max()
-    };
+    int num_threads = std::thread::hardware_concurrency();
+    std::vector<std::future<std::pair<double, std::array<double, 3>>>> futures(num_threads);
 
-    for (int i = 0; i < 4; ++i) {
-        std::vector<std::array<double, 3>> subset;
-        int start = i * 7 - (i > 1 ? i - 1 : 0);
-        int end = start + 7 - (i > 1 ? 1 : 0);
-        for (int j = start; j < std::min(end, static_cast<int>(palette.size())); ++j) {
-            subset.push_back(palette[j]);
-        }
+    int chunk_size = palette.size() / num_threads;
 
-        threads[i] = std::thread([&results, &min_distances, i, color, &subset]() {
-                for (const auto& palette_color : subset) {
-                    double delta = ciede2000(color, palette_color);
+    for (int i = 0; i < num_threads; ++i) {
+        int start = i * chunk_size;
+        int end = (i == num_threads - 1) ? palette.size() : start + chunk_size;
 
-                    if (delta < min_distances[i]) {
-                        min_distances[i] = delta;
-                        results[i] = palette_color;
-                    }
+        futures[i] = std::async(std::launch::async, [color, start, end, &palette]() {
+            double min_distance = std::numeric_limits<double>::max();
+            std::array<double, 3> nearest_color;
+
+            for (int j = start; j < end; ++j) {
+                double delta = ciede2000(color, palette[j]);
+
+                if (delta < min_distance) {
+                    min_distance = delta;
+                    nearest_color = palette[j];
                 }
             }
-        );
+
+            return std::make_pair(min_distance, nearest_color);
+        });
     }
 
-    for (auto& thread : threads) {
-        thread.join();
-    }
+    double min_distance = std::numeric_limits<double>::max();
+    std::array<double, 3> new_color;
 
-    double min_distance = min_distances[0];
-    std::array<double, 3> new_color = results[0];
-    for (int i = 1; i < 4; ++i) {
-        if (min_distances[i] < min_distance) {
-            min_distance = min_distances[i];
-            new_color = results[i];
+    for (auto& future : futures) {
+        auto [distance, color] = future.get();
+        if (distance < min_distance) {
+            min_distance = distance;
+            new_color = color;
         }
     }
 
@@ -73,7 +67,7 @@ nlohmann::json read_palette(const Palette palette) {
             return read_palette_from_file("./palettes/rose_pine.json");
         case Palette::MaterialSakura:
             return read_palette_from_file("./palettes/material_sakura.json");
-        case Palette::Catpuccin:
+        case Palette::Catppuccin:
             return read_palette_from_file("./palettes/catpuccin.json");
         default:
             throw std::runtime_error("Invalid palette");

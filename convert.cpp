@@ -64,3 +64,11 @@ std::vector<std::array<double, 3>> hex_to_lab(const nlohmann::json& palette) {
 
     return lab_colors;
 }
+
+std::array<double, 3> rgb2lab(unsigned char r, unsigned char g, unsigned char b) {
+    std::array<double, 3> xyz = rgb2xyz(r, g, b);
+
+    std::array<double, 3> lab = xyz2lab(xyz[0], xyz[1], xyz[2]);
+
+    return lab;
+}

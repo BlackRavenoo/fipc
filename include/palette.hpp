@@ -9,7 +9,7 @@ enum class Palette {
     Gruvbox,
     RosePine,
     MaterialSakura,
-    Catpuccin,
+    Catppuccin,
     Custom,
 };
 
