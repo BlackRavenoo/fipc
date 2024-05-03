@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cmath>
 #include "convert.hpp"
 
@@ -49,20 +48,14 @@ std::array<double, 3> xyz2lab(double X, double Y, double Z) {
     return {L, a, b};
 }
 
-std::vector<std::array<double, 3>> hex_to_lab(const nlohmann::json& palette) {
-    std::vector<std::array<double, 3>> lab_colors;
-    
-    for (auto& [key, hex_color] : palette.items()) {
-        int r, g, b;
-        std::sscanf(hex_color.get<std::string>().c_str(), "#%02x%02x%02x", &r, &g, &b);
+std::array<double, 3> hex2lab(const std::string& hex_color) {
+    int r, g, b;
+    std::sscanf(hex_color.c_str(), "#%02x%02x%02x", &r, &g, &b);
 
-        std::array<double, 3> xyz = rgb2xyz(r, g, b);
-        std::array<double, 3> lab = xyz2lab(xyz[0], xyz[1], xyz[2]);
+    std::array<double, 3> xyz = rgb2xyz(r, g, b);
+    std::array<double, 3> lab = xyz2lab(xyz[0], xyz[1], xyz[2]);
 
-        lab_colors.push_back(lab);
-    }
-
-    return lab_colors;
+    return lab;
 }
 
 std::array<double, 3> rgb2lab(unsigned char r, unsigned char g, unsigned char b) {
@@ -71,4 +64,32 @@ std::array<double, 3> rgb2lab(unsigned char r, unsigned char g, unsigned char b)
     std::array<double, 3> lab = xyz2lab(xyz[0], xyz[1], xyz[2]);
 
     return lab;
+}
+
+std::array<int, 3> lab2rgb(double l, double a, double B) {
+    double y = (l + 16) / 116;
+    double x = a / 500 + y;
+    double z = y - B / 200;
+
+    x = 95.047 * ((x > 0.206897) ? x * x * x : (x - 16.0 / 116) / 7.787);
+    y = 100.000 * ((y > 0.206897) ? y * y * y : (y - 16.0 / 116) / 7.787);
+    z = 108.883 * ((z > 0.206897) ? z * z * z : (z - 16.0 / 116) / 7.787);
+
+    x /= 100;
+    y /= 100;
+    z /= 100;
+
+    double r = x * 3.2406 + y * -1.5372 + z * -0.4986;
+    double g = x * -0.9689 + y * 1.8758 + z * 0.0415;
+    double b = x * 0.0557 + y * -0.2040 + z * 1.0570;
+
+    r = (r > 0.0031308) ? 1.055 * std::pow(r, 1 / 2.4) - 0.055 : 12.92 * r;
+    g = (g > 0.0031308) ? 1.055 * std::pow(g, 1 / 2.4) - 0.055 : 12.92 * g;
+    b = (b > 0.0031308) ? 1.055 * std::pow(b, 1 / 2.4) - 0.055 : 12.92 * b;
+
+    auto clamp = [](double value) {
+        return static_cast<int>(std::round(std::max(0.0, std::min(1.0, value)) * 255));
+    };
+
+    return {clamp(r), clamp(g), clamp(b)};
 }

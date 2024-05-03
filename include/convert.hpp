@@ -1,6 +1,5 @@
 #include <array>
-#include <vector>
-#include <nlohmann/json.hpp>
+#include <string>
 
 std::array<double, 3> rgb2xyz(
     unsigned char r, unsigned char g, unsigned char b
@@ -14,4 +13,6 @@ std::array<double, 3> rgb2lab(
     unsigned char r, unsigned char g, unsigned char b
 );
 
-std::vector<std::array<double, 3>> hex_to_lab(const nlohmann::json& palette);
+std::array<double, 3> hex2lab(const std::string& hex_color);
+
+std::array<int, 3> lab2rgb(double l, double a, double b);

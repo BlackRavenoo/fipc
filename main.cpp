@@ -1,6 +1,4 @@
-#include <array>
-#include <iostream>
-#include <iomanip>
+#include <thread>
 #include "ciede2000.hpp"
 #include "convert.hpp"
 #include "palette.hpp"
@@ -10,43 +8,50 @@
 int main(int argc, char *argv[]) {
     Args args = get_args(argc, argv);
 
-    std::cout << args.image << std::endl;
+    auto palette = parse_palette(args.palette).flatten();
 
-    std::cout << args.palette << std::endl;
+    Image image(args.image.c_str());
 
-    unsigned char r1 = 255, g1 = 0, b1 = 0;
-    unsigned char r2 = 0, g2 = 255, b2 = 0;
+    std::vector<std::array<double, 3>> lab_colors;
+    for (const auto& hex_color : palette) {
+        lab_colors.push_back(hex2lab(hex_color));
+    }
 
-    std::array<double, 3> xyz1 = rgb2xyz(r1, g1, b1);
-    std::array<double, 3> xyz2 = rgb2xyz(r2, g2, b2);
+    int num_threads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads(num_threads);
 
-    std::array<double, 3> lab1 = xyz2lab(xyz1[0], xyz1[1], xyz1[2]);
-    std::array<double, 3> lab2 = xyz2lab(xyz2[0], xyz2[1], xyz2[2]);
+    int chunk_size = image.size / num_threads;
 
-    std::cout << "Цвет 1 (RGB): " << static_cast<int>(r1) << ", " << static_cast<int>(g1) << ", " << static_cast<int>(b1) << std::endl;
-    std::cout << "Цвет 1 (LAB): " << lab1[0] << ", " << lab1[1] << ", " << lab1[2] << std::endl;
+    for (int t = 0; t < num_threads; ++t) {
+        threads[t] = std::thread([&, t]() {
+            int start = t * chunk_size;
+            int end = (t == num_threads - 1) ? image.size : start + chunk_size;
 
-    std::cout << "Цвет 2 (RGB): " << static_cast<int>(r2) << ", " << static_cast<int>(g2) << ", " << static_cast<int>(b2) << std::endl;
-    std::cout << "Цвет 2 (LAB): " << lab2[0] << ", " << lab2[1] << ", " << lab2[2] << std::endl;
-    
-    std::array<double, 3> lab1_a = {lab1[0], lab1[1], lab1[2]};
-    std::array<double, 3> lab2_a = {lab2[0], lab2[1], lab2[2]};
-    double ciede2000Result = ciede2000(lab1_a, lab2_a);
-    std::cout << std::fixed << std::setprecision(15) << ciede2000Result << std::endl;
+            for (int i = start; i < end; i += image.channels) {
+                std::array<double, 3> lab = rgb2lab(image.data[i], image.data[i + 1], image.data[i + 2]);
+                auto res = nearest_palette(lab, lab_colors);
+                auto res_rgb = lab2rgb(res[0], res[1], res[2]);
+                image.data[i] = res_rgb[0];
+                image.data[i + 1] = res_rgb[1];
+                image.data[i + 2] = res_rgb[2];
+            }
+        });
+    }
 
-    auto palette = read_palette(Palette::Catppuccin)["Latte"];
+    for (auto& thread : threads) {
+        thread.join();
+    }
 
-    auto lab_colors = hex_to_lab(palette);
+    if (args.output.empty()) {
+        args.output = "output.png";
+    }
 
-    auto res = nearest_palette(lab1_a, lab_colors);
+    std::filesystem::path outputPath(args.output);
+    if (!outputPath.parent_path().empty() && !std::filesystem::exists(outputPath.parent_path())) {
+        std::filesystem::create_directories(outputPath.parent_path());
+    }
 
-    std::cout << res[0] << " " << res[1] << " " << res[2] << std::endl;
+    image.write(args.output.c_str());
 
-    Image image("anime-city-2.jpg");
-
-    std::cout << image.width << " " << image.height << " " << image.channels << image.size << std::endl;
-
-    image.write("output.png");
-    
     return 0;
 }
