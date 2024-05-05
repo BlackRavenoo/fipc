@@ -16,22 +16,23 @@ double ciede2000(
     const std::array<double, 3>& lab2,
     const std::array<double, 3> factors
 ) {
-    const double luminanceFactor = std::get<0>(factors);
-    const double chromaFactor = std::get<1>(factors);
-    const double hueFactor = std::get<2>(factors);
+    const double luminanceFactor = factors[0];
+    const double chromaFactor = factors[1];
+    const double hueFactor = factors[2];
 
-    const double L1 = std::get<0>(lab1);
-    const double a1 = std::get<1>(lab1);
-    const double b1 = std::get<2>(lab1);
+    const double L1 = lab1[0];
+    const double a1 = lab1[1];
+    const double b1 = lab1[2];
 
-    const double L2 = std::get<0>(lab2);
-    const double a2 = std::get<1>(lab2);
-    const double b2 = std::get<2>(lab2);
+    const double L2 = lab2[0];
+    const double a2 = lab2[1];
+    const double b2 = lab2[2];
 
-    const double C1 = sqrt(a1 * a1 + b1 * b1);
-    const double C2 = sqrt(a2 * a2 + b2 * b2);
+    const double C1 = std::hypot(a1, b1);
+    const double C2 = std::hypot(a2, b2);
     const double C_avg = (C1 + C2) / 2.0;
-    const double G = 0.5 * (1.0 - sqrt(pow(C_avg, 7) / (pow(C_avg, 7) + C_25_7)));
+    const double C_avg7 = std::pow(C_avg, 7);
+    const double G = 0.5 * (1.0 - sqrt(C_avg7 / (C_avg7 + C_25_7)));
 
     const double a1_prime = (1.0 + G) * a1;
     const double a2_prime = (1.0 + G) * a2;
@@ -42,8 +43,8 @@ double ciede2000(
     h1 = (h1 >= 0) ? radians_to_degrees(h1) : radians_to_degrees(h1) + 360.0;
     h2 = (h2 >= 0) ? radians_to_degrees(h2) : radians_to_degrees(h2) + 360.0;
 
-    const double C1_prime = sqrt(a1_prime * a1_prime + b1 * b1);
-    const double C2_prime = sqrt(a2_prime * a2_prime + b2 * b2);
+    const double C1_prime = std::hypot(a1_prime, b1);
+    const double C2_prime = std::hypot(a2_prime, b2);
     
     const double delta_L_prime = L2 - L1;
     const double delta_C_prime = C2_prime - C1_prime;
@@ -74,7 +75,8 @@ double ciede2000(
 
     const double delta_theta = 30 * exp(-((h_prime_avg - 275) / 25) * ((h_prime_avg - 275) / 25));
 
-    const double R_T = -sin(degrees_to_radians(2 * delta_theta)) * 2 * sqrt(pow(C_, 7) / (pow(C_, 7) + C_25_7));
+    const double C_7 = std::pow(C_, 7);
+    const double R_T = -std::sin(degrees_to_radians(2 * delta_theta)) * 2 * std::sqrt(C_7 / (C_7 + C_25_7));
 
     const double delta_L = delta_L_prime / (luminanceFactor * S_L);
 

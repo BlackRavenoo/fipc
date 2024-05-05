@@ -9,6 +9,8 @@ include(${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
 
 set(CMAKE_CXX_STANDARD 23)
 
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+
 set(SOURCE_FILES main.cpp convert.cpp ciede2000.cpp palette.cpp cli.cpp image.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -20,6 +22,7 @@ find_package(CLI11 REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 add_compile_options(-pthread)
+add_compile_options(-ftree-vectorize)
 add_link_options(-lpthread)
 
 add_executable(cpp_project ${SOURCE_FILES})

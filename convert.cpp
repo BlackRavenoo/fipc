@@ -9,17 +9,17 @@ std::array<double, 3> rgb2xyz(unsigned char r, unsigned char g, unsigned char b)
     if (R > 0.04045) 
         R = std::pow((R + 0.055) / 1.055, 2.4);
     else 
-        R = R / 12.92;
+        R /= 12.92;
 
     if (G > 0.04045)
         G = std::pow((G + 0.055) / 1.055, 2.4);
     else 
-        G = G / 12.92;
+        G /= 12.92;
 
     if (B > 0.04045)
         B = std::pow((B + 0.055) / 1.055, 2.4);
     else 
-        B = B / 12.92;
+        B /= 12.92;
 
     R *= 100;
     G *= 100;
