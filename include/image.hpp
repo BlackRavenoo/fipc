@@ -5,8 +5,7 @@ enum ImageFormat {
     PNG,
     JPG,
     BMP,
-    TGA,
-    HDR
+    TGA
 };
 
 struct Image {

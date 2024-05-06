@@ -63,9 +63,6 @@ bool Image::write(const char* filename) {
         case ImageFormat::TGA:
             status = stbi_write_tga(filename, width, height, channels, data);
             break;
-        case ImageFormat::HDR:
-            status = stbi_write_hdr(filename, width, height, channels, reinterpret_cast<float*>(data));
-            break;
     }
 
     return status != 0;
@@ -80,8 +77,6 @@ ImageFormat Image::get_format(const char* filename) {
             return ImageFormat::BMP;
         } else if(strcmp(ext, ".tga") == 0) {
             return ImageFormat::TGA;
-        } else if(strcmp(ext, ".hdr") == 0) {
-            return ImageFormat::HDR;
         }
     }
 

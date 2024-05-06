@@ -67,7 +67,9 @@ double ciede2000(
 
     const double T = 1 - 0.17 * cos(degrees_to_radians(h_prime_avg - 30)) + 0.24 * cos(degrees_to_radians(2 * h_prime_avg)) + 0.32 * cos(degrees_to_radians(3 * h_prime_avg + 6)) - 0.20 * cos(degrees_to_radians(4 * h_prime_avg - 63));
 
-    const double S_L = 1 + (0.015 * pow(L_ - 50, 2)) / sqrt(20 + pow(L_ - 50, 2));
+    const double L_temp = pow(L_ - 50, 2);
+
+    const double S_L = 1 + (0.015 * L_temp) / sqrt(20 + L_temp);
 
     const double S_C = 1 + 0.045 * C_;
 

@@ -78,6 +78,10 @@ int main(int argc, char *argv[]) {
 
     if (args.output.empty()) {
         args.output = "output.png";
+    } else if (args.output.find('.') == std::string::npos) {
+        args.output += ".png";
+    } else if (args.output.substr(args.output.find_last_of('.')) != ".png" && image.get_format(args.output.c_str()) == ImageFormat::PNG) {
+        args.output += ".png";
     }
 
     std::filesystem::path outputPath(args.output);

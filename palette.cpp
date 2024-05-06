@@ -46,7 +46,7 @@ nlohmann::json parse_palette(const std::string& palette) {
 
     if (palette_files.count(palette)) {
         return read_palette_from_file(palette_files[palette]);
-    } else if (std::filesystem::exists(palette)) {
+    } else if (palette.ends_with(".json") && std::filesystem::exists(palette)) {
         return read_palette_from_file(palette);
     } else {
         try {
