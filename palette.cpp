@@ -5,13 +5,14 @@
 
 std::array<double, 3> nearest_palette(
     const std::array<double, 3>& color, 
-    const std::vector<std::array<double, 3>>& palette
+    const std::vector<std::array<double, 3>>& palette,
+    const std::array<double, 3>& factors
 ) {
     double min_distance = std::numeric_limits<double>::max();
     std::array<double, 3> nearest_color;
 
     for (const auto& palette_color : palette) {
-        double delta = ciede2000(color, palette_color);
+        double delta = ciede2000(color, palette_color, factors);
 
         if (delta < min_distance) {
             min_distance = delta;

@@ -1,7 +1,8 @@
+#include <algorithm>
 #include <cmath>
 #include "convert.hpp"
 
-std::array<double, 3> rgb2xyz(unsigned char r, unsigned char g, unsigned char b) {
+inline std::array<double, 3> rgb2xyz(unsigned char r, unsigned char g, unsigned char b) {
     double R = static_cast<double>(r) / 255.0;
     double G = static_cast<double>(g) / 255.0;
     double B = static_cast<double>(b) / 255.0;
@@ -32,7 +33,7 @@ std::array<double, 3> rgb2xyz(unsigned char r, unsigned char g, unsigned char b)
     return {X, Y, Z};
 }
 
-std::array<double, 3> xyz2lab(double X, double Y, double Z) {
+inline std::array<double, 3> xyz2lab(double X, double Y, double Z) {
     double x = X / 95.047;
     double y = Y / 100.0;
     double z = Z / 108.883;
@@ -88,7 +89,7 @@ std::array<int, 3> lab2rgb(double l, double a, double B) {
     b = (b > 0.0031308) ? 1.055 * std::pow(b, 1 / 2.4) - 0.055 : 12.92 * b;
 
     auto clamp = [](double value) {
-        return static_cast<int>(std::round(std::max(0.0, std::min(1.0, value)) * 255));
+        return static_cast<int>(std::round(std::clamp(value, 0.0, 1.0) * 255));
     };
 
     return {clamp(r), clamp(g), clamp(b)};

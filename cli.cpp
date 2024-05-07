@@ -20,6 +20,8 @@ Args get_args(int argc, char *argv[]) {
 
     app.add_option("-o,--output", a.output, "Output file path");
 
+    app.add_option("-f, --factors", a.factors, "Factors: Lightness, Chroma, Hue");
+
     app.set_version_flag("-V,--version", "cpp_project v0.1");
 
     app.set_help_flag("-h,--help", "Print this message and exit");

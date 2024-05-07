@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
                 if (nearest_palette_cache.find(lab) != nearest_palette_cache.end()) {
                     nearest = nearest_palette_cache[lab];
                 } else {
-                    nearest = nearest_palette(lab, lab_colors);
+                    nearest = nearest_palette(lab, lab_colors, args.factors);
                     nearest_palette_cache[lab] = nearest;
                 }
 
@@ -75,6 +75,8 @@ int main(int argc, char *argv[]) {
     for (auto& thread : threads) {
         thread.join();
     }
+    
+    auto end_time = std::chrono::high_resolution_clock::now();
 
     if (args.output.empty()) {
         args.output = "output.png";
@@ -91,7 +93,6 @@ int main(int argc, char *argv[]) {
 
     image.write(args.output.c_str());
 
-    auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
     std::cout << "Execution time: " << duration << "ms" << std::endl;
