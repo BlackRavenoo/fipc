@@ -41,7 +41,6 @@ nlohmann::json parse_palette(const std::string& palette) {
         {"Nord", "./palettes/nord.json"},
         {"Gruvbox", "./palettes/gruvbox.json"},
         {"RosePine", "./palettes/rose_pine.json"},
-        {"MaterialSakura", "./palettes/material_sakura.json"},
         {"Catppuccin", "./palettes/catppuccin.json"}
     };
 
