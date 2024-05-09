@@ -18,6 +18,7 @@ struct ArrayHash {
 };
 
 int main(int argc, char *argv[]) {
+    auto start_time1 = std::chrono::high_resolution_clock::now();
     Args args = get_args(argc, argv);
 
     auto palette = parse_palette(args.palette).flatten();
@@ -93,9 +94,15 @@ int main(int argc, char *argv[]) {
 
     image.write(args.output.c_str());
 
+    auto end_time1 = std::chrono::high_resolution_clock::now();
+
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
     std::cout << "Execution time: " << duration << "ms" << std::endl;
+
+    auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(end_time1 - start_time1).count();
+
+    std::cout << "Total execution time: " << duration1 << "ms" << std::endl;
 
     return 0;
 }
