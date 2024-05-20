@@ -1,5 +1,6 @@
 #include <vector>
-#include <nlohmann/json.hpp>
+#include <filesystem>
+#include "json.hpp"
 
 std::array<double, 3> nearest_palette(
     const std::array<double, 3>& color, 

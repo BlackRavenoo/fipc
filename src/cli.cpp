@@ -1,4 +1,4 @@
-#include <CLI/CLI.hpp>
+#include "CLI11.hpp"
 #include "palette.hpp"
 #include "cli.hpp"
 
@@ -16,7 +16,7 @@ Args get_args(int argc, char *argv[]) {
 
     app.add_option("palette", a.palette, palette_desc)->required();
 
-    app.add_option("image", a.image, "Image to process")->required();
+    app.add_option("image", a.image, "Image to process")->required()->check(CLI::ExistingFile);
 
     app.add_option("-o,--output", a.output, "Output file path");
 
