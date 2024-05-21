@@ -7,7 +7,7 @@ Args get_args(int argc, char *argv[]) {
 
     Args a;
 
-    std::vector<std::string> available_palettes = {"TokyoNight", "Dracula", "Solarized", "Nord", "Gruvbox", "RosePine", "Catpuccin", "Edge", "Sonokai"};
+    std::vector<std::string> available_palettes = {"TokyoNight", "Dracula", "Solarized", "Nord", "Gruvbox", "RosePine", "Catpuccin", "Edge", "Sonokai", "GruvboxMaterial"};
 
     std::string palette_desc = "Palette to use.\nThis can be either a name of a palette or a path to a JSON file with a palette.\nAvailable palettes:";
     for (const auto& palette : available_palettes) {

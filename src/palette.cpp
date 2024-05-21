@@ -43,7 +43,8 @@ nlohmann::json parse_palette(const std::string& palette) {
         {"RosePine", "./palettes/rose_pine.json"},
         {"Catppuccin", "./palettes/catppuccin.json"},
         {"Edge", "./palettes/edge.json"},
-        {"Sonokai", "./palettes/sonokai.json"}
+        {"Sonokai", "./palettes/sonokai.json"},
+        {"GruvboxMaterial", "./palettes/gruvbox_material.json"}
     };
 
     if (palette_files.count(palette)) {
