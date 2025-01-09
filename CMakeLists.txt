@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(cpp_project VERSION 0.1.1)
+project(fipc VERSION 0.1.1)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
@@ -13,4 +13,4 @@ add_compile_options(-pthread)
 add_compile_options(-ftree-vectorize)
 add_link_options(-lpthread)
 
-add_executable(cpp_project ${SOURCE_FILES})
+add_executable(fipc ${SOURCE_FILES})
