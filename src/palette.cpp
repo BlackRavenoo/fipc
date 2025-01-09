@@ -1,5 +1,7 @@
 #include <array>
 #include <fstream>
+#include <iostream>
+#include "palettes_map.h"
 #include "ciede2000.hpp"
 #include "palette.hpp"
 
@@ -34,28 +36,19 @@ nlohmann::json read_palette_from_file(const std::string& filename) {
 }
 
 nlohmann::json parse_palette(const std::string& palette) {
-    std::map<std::string, std::string> palette_files = {
-        {"TokyoNight", "./palettes/tokyo_night.json"},
-        {"Dracula", "./palettes/dracula.json"},
-        {"Solarized", "./palettes/solarized.json"},
-        {"Nord", "./palettes/nord.json"},
-        {"Gruvbox", "./palettes/gruvbox.json"},
-        {"RosePine", "./palettes/rose_pine.json"},
-        {"Catppuccin", "./palettes/catppuccin.json"},
-        {"Edge", "./palettes/edge.json"},
-        {"Sonokai", "./palettes/sonokai.json"},
-        {"GruvboxMaterial", "./palettes/gruvbox_material.json"}
-    };
-
-    if (palette_files.count(palette)) {
-        return read_palette_from_file(palette_files[palette]);
+    std::string lower_palette = palette;
+    std::transform(lower_palette.begin(), lower_palette.end(), lower_palette.begin(), ::tolower);
+    if (palettes.count(lower_palette)) {
+        auto [data, size] = palettes[lower_palette];
+        return nlohmann::json::parse(data, data + size);
     } else if (palette.ends_with(".json") && std::filesystem::exists(palette)) {
         return read_palette_from_file(palette);
     } else {
         try {
             return nlohmann::json::parse(palette);
         } catch (nlohmann::json::parse_error&) {
-            throw std::runtime_error("Invalid palette");
+            std::cout << "Invalid palette";
+            std::exit(1);
         }
     }
 }
