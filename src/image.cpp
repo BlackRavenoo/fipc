@@ -18,7 +18,7 @@ Image::Image(int width, int height, int channels) : width(width), height(height)
     data = new uint8_t[size];
 }
 
-Image::Image(const Image &other) : width(other.width), height(other.height), channels(other.channels), size(other.size){
+Image::Image(const Image &other) : size(other.size), width(other.width), height(other.height), channels(other.channels) {
     data = new uint8_t[size];
     std::copy(other.data, other.data + size, data);
 }
@@ -39,12 +39,21 @@ Image& Image::operator=(const Image &other) {
 }
 
 Image::~Image() {
-    stbi_image_free(data);
+    delete[] data;
 }
 
 bool Image::read(const char* filename) {
-    data = stbi_load(filename, &width, &height, &channels, 0);
-    return data != nullptr;
+    uint8_t *stb_data = stbi_load(filename, &width, &height, &channels, 0);
+    if (!stb_data) {
+        return false;
+    }
+
+    size_t loaded_size = static_cast<size_t>(width) * height * channels;
+    data = new uint8_t[loaded_size];
+    std::copy(stb_data, stb_data + loaded_size, data);
+    stbi_image_free(stb_data);
+
+    return true;
 }
 
 bool Image::write(const char* filename) {
