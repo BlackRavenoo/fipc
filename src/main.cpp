@@ -31,15 +31,25 @@ int main(int argc, char *argv[]) {
     }
 
     int num_threads = std::thread::hardware_concurrency();
+    if (num_threads <= 0) {
+        num_threads = 1;
+    }
     std::vector<std::thread> threads(num_threads);
 
-    int chunk_size = image.size / num_threads;
+    int num_pixels = image.width * image.height;
+    int channels = image.channels;
 
+    int base_pixels = num_pixels / num_threads;
+    int remainder = num_pixels % num_threads;
+
+    int pixel_offset = 0;
     for (int t = 0; t < num_threads; ++t) {
-        threads[t] = std::thread([&, t]() {
-            int start = t * chunk_size;
-            int end = (t == num_threads - 1) ? image.size : start + chunk_size;
+        int pixels_for_thread = base_pixels + (t < remainder ? 1 : 0);
+        int start = pixel_offset * channels;
+        int end = start + pixels_for_thread * channels;
+        pixel_offset += pixels_for_thread;
 
+        threads[t] = std::thread([&, start, end]() {
             std::unordered_map<std::array<uint8_t, 3>, std::array<double, 3>, ArrayHash> rgb2lab_cache;
             std::unordered_map<std::array<double, 3>, std::array<double, 3>, ArrayHash> nearest_palette_cache;
 
