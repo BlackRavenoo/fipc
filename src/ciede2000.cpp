@@ -11,6 +11,12 @@ constexpr double degrees_to_radians(const double degrees) {
     return degrees * (M_PI / 180.0);
 }
 
+constexpr double pow7(const double x) {
+    const double x2 = x * x;
+    const double x4 = x2 * x2;
+    return x4 * x2 * x;
+}
+
 double ciede2000(
     const std::array<double, 3>& lab1,
     const std::array<double, 3>& lab2,
@@ -31,7 +37,7 @@ double ciede2000(
     const double C1 = std::hypot(a1, b1);
     const double C2 = std::hypot(a2, b2);
     const double C_avg = (C1 + C2) / 2.0;
-    const double C_avg7 = std::pow(C_avg, 7);
+    const double C_avg7 = pow7(C_avg);
     const double G = 0.5 * (1.0 - sqrt(C_avg7 / (C_avg7 + C_25_7)));
 
     const double a1_prime = (1.0 + G) * a1;
@@ -77,7 +83,7 @@ double ciede2000(
 
     const double delta_theta = 30 * exp(-((h_prime_avg - 275) / 25) * ((h_prime_avg - 275) / 25));
 
-    const double C_7 = std::pow(C_, 7);
+    const double C_7 = pow7(C_);
     const double R_T = -std::sin(degrees_to_radians(2 * delta_theta)) * 2 * std::sqrt(C_7 / (C_7 + C_25_7));
 
     const double delta_L = delta_L_prime / (luminanceFactor * S_L);
